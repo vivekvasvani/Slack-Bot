@@ -1,21 +1,21 @@
 package server
 
 import (
-
 	"encoding/json"
-	"github.com/valyala/fasthttp"
+	"strconv"
 	"strings"
 	"time"
-	"strconv"
+
+	"github.com/valyala/fasthttp"
+	"github.com/vivekvasvani/Slack-Bot/tree/master/client"
 )
 
 const (
-	application_json ="application/json"
+	application_json = "application/json"
 	//slackUrl="https://hooks.slack.com/services/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"
 	//slackUrl="https://hooks.slack.com/services/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"
-	slackUrl="https://hooks.slack.com/services/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"
+	slackUrl = "https://hooks.slack.com/services/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"
 )
-
 
 func postAdmissionResults(ctx *fasthttp.RequestCtx) {
 
@@ -33,28 +33,28 @@ func postAdmissionResults(ctx *fasthttp.RequestCtx) {
 	output := make([]string, 0)
 	for _, v := range slotSplit {
 		avaSlot := &Slot{}
-		slotResponse := client.HitRequest("http://mordor.myntra.com/admission/context/eors/slot/" + v, "GET", header, "")
+		slotResponse := client.HitRequest("http://mordor.myntra.com/admission/context/eors/slot/"+v, "GET", header, "")
 		var slot = client.GetResponse("$.eors+", slotResponse)
 		//log.Println(slot)
 		json.Unmarshal([]byte(slot), avaSlot)
-		if(avaSlot.Name=="EORS-Slot-1"){
-			avaSlot.CurrentUsers=avaSlot.CurrentUsers+128738
-			avaSlot.MaxUserPerSlot=249999+avaSlot.MaxUserPerSlot
+		if avaSlot.Name == "EORS-Slot-1" {
+			avaSlot.CurrentUsers = avaSlot.CurrentUsers + 128738
+			avaSlot.MaxUserPerSlot = 249999 + avaSlot.MaxUserPerSlot
 		}
 		currentUsers = currentUsers + avaSlot.CurrentUsers
 		totalUsers = totalUsers + avaSlot.MaxUserPerSlot
 		percentage := (float64(avaSlot.CurrentUsers) / float64(avaSlot.MaxUserPerSlot)) * 100
-		startTime := strconv.Itoa(time.Unix(avaSlot.SlotStartTime / 1000, 0).Hour()) + ":" + strconv.Itoa(time.Unix(avaSlot.SlotStartTime / 1000, 0).Minute())
-		output = append(output, "SlotStartTime=" + startTime + ", CurrentUsers=" + strconv.FormatInt(avaSlot.CurrentUsers, 10)+ " ,MaxUsers=" + strconv.FormatInt(avaSlot.MaxUserPerSlot, 10)+ " ,SlotsPercentage="+ strconv.Itoa(int(percentage)) + "%")
+		startTime := strconv.Itoa(time.Unix(avaSlot.SlotStartTime/1000, 0).Hour()) + ":" + strconv.Itoa(time.Unix(avaSlot.SlotStartTime/1000, 0).Minute())
+		output = append(output, "SlotStartTime="+startTime+", CurrentUsers="+strconv.FormatInt(avaSlot.CurrentUsers, 10)+" ,MaxUsers="+strconv.FormatInt(avaSlot.MaxUserPerSlot, 10)+" ,SlotsPercentage="+strconv.Itoa(int(percentage))+"%")
 		//fmt.Println("SlotStartTime="+startTime+" ,CurrentUsers="+strconv.FormatInt(avaSlot.CurrentUsers, 10),",MaxUsers="+strconv.FormatInt(avaSlot.MaxUserPerSlot, 10),",SlotsPercentage=",strconv.Itoa(int(percentage))+"%")
 	}
 	ttlPercentage := (float64(currentUsers) / float64(totalUsers)) * 100
-	output = append(output, "Total:=" + strconv.Itoa(int(currentUsers))+ " / TotalPercentage:=" + strconv.Itoa(int(ttlPercentage)) + "%")
+	output = append(output, "Total:="+strconv.Itoa(int(currentUsers))+" / TotalPercentage:="+strconv.Itoa(int(ttlPercentage))+"%")
 
 	//fmt.Println("Total:=="+strconv.Itoa(int(currentUsers)),"TotalPercentage="+strconv.Itoa(int(ttlPercentage))+"%")
 	//fmt.Println(output)
 
-	reader := SubstParams(output,getPayload("slackpayload"))
+	reader := SubstParams(output, getPayload("slackpayload"))
 	//log.Println(reader)
 
 	client.HitRequest(slackUrl, "POST", header, reader)
@@ -66,7 +66,6 @@ func postAdmissionResults(ctx *fasthttp.RequestCtx) {
 	ctx.Response.SetBodyString("Ok")
 }
 
-
-func prepareSlackPayload(){
+func prepareSlackPayload() {
 
 }
