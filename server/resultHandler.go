@@ -4,7 +4,6 @@ import (
 
 	"encoding/json"
 	"github.com/valyala/fasthttp"
-	"bitbucket.org/myntra/admission_bot/client"
 	"strings"
 	"time"
 	"strconv"
