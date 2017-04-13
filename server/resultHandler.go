@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/valyala/fasthttp"
-	"github.com/vivekvasvani/Slack-Bot/tree/master/client"
+	"github.com/vivekvasvani/Slack-Bot/client"
 )
 
 const (
