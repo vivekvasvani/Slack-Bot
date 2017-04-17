@@ -1,10 +1,10 @@
 {
-  "channel": "#testslack",		
+  "channel": "#hikeqa",		
   "attachments": [
     {
-      "fallback": "Avilable",
+      "fallback": "Available",
       "pretext": "Device Availability",
-      "title": "Avilable",
+      "title": "Available",
       "title_link": "http://devicefarm.hikeapp.com/#!/devices",
       "fields": [
         { "title": "Model, OS, Serial", "value": "${0}", "short": true }

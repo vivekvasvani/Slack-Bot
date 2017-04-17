@@ -8,7 +8,6 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-// NewServer exposes api for admission control
 func NewServer() {
 
 	router := fasthttprouter.New()
