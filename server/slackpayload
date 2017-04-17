@@ -1,3 +1,31 @@
 {
-  "text": "``` ${0} \n ${1} \n ${2} \n ${3} \n ${4} \n ${5} \n ${6} \n ${7} \n ${8} ``` \n *${9}*", "username": "slack-bot"
+  "channel": "#testslack",		
+  "attachments": [
+    {
+      "fallback": "Avilable",
+      "pretext": "Device Availability",
+      "title": "Avilable",
+      "title_link": "http://devicefarm.hikeapp.com/#!/devices",
+      "fields": [
+        { "title": "Model, OS, Serial", "value": "${0}", "short": true }
+      ],
+      "color": "#7CD197"
+    },
+    {
+      "title": "Busy",
+      "title_link": "http://devicefarm.hikeapp.com/#!/devices",
+      "fields": [
+        { "title": "Model, OS, Serial, User", "value": "${1}", "short": true }
+      ],
+      "color": "#f4a641"
+    },
+    {
+      "title": "Disconnected",
+      "title_link": "http://devicefarm.hikeapp.com/#!/devices",
+      "fields": [
+        { "title": "Model, Serial", "value": "${2}", "short": true }
+      ],
+      "color": "#f44141"
+    }
+  ]
 }

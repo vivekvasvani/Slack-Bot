@@ -2,70 +2,88 @@ package server
 
 import (
 	"encoding/json"
-	"strconv"
-	"strings"
-	"time"
-
+	"fmt"
 	"github.com/valyala/fasthttp"
 	"github.com/vivekvasvani/Slack-Bot/client"
+	"strconv"
 )
 
 const (
 	application_json = "application/json"
-	//slackUrl="https://hooks.slack.com/services/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"
-	//slackUrl="https://hooks.slack.com/services/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"
-	slackUrl = "https://hooks.slack.com/services/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"
+	slackUrl         = "https://hooks.slack.com/services/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"
 )
 
-func postAdmissionResults(ctx *fasthttp.RequestCtx) {
+var header = make(map[string]string)
 
-	header := make(map[string]string)
+func getSTGStatus(ctx *fasthttp.RequestCtx) {
+	var (
+		responseV    STFResponse
+		available    string
+		busy         string
+		disconnected string
+		indexA       int = 1
+		indexB       int = 1
+		indexD       int = 1
+	)
 	header["Content-Type"] = application_json
 	header["Accept"] = application_json
-	response := client.HitRequest("http://mordor.myntra.com/admission/context/eors/slot", "GET", header, "")
-	var allSlots = client.GetResponse("$.eors+", response)
-	allSlots = strings.Replace(allSlots, "[", "", -1)
-	allSlots = strings.Replace(allSlots, "]", "", -1)
-	allSlots = strings.Replace(allSlots, "\"", "", -1)
-	var slotSplit = strings.Split(allSlots, ",")
-	var currentUsers int64
-	var totalUsers int64
-	output := make([]string, 0)
-	for _, v := range slotSplit {
-		avaSlot := &Slot{}
-		slotResponse := client.HitRequest("http://mordor.myntra.com/admission/context/eors/slot/"+v, "GET", header, "")
-		var slot = client.GetResponse("$.eors+", slotResponse)
-		//log.Println(slot)
-		json.Unmarshal([]byte(slot), avaSlot)
-		if avaSlot.Name == "EORS-Slot-1" {
-			avaSlot.CurrentUsers = avaSlot.CurrentUsers + 128738
-			avaSlot.MaxUserPerSlot = 249999 + avaSlot.MaxUserPerSlot
-		}
-		currentUsers = currentUsers + avaSlot.CurrentUsers
-		totalUsers = totalUsers + avaSlot.MaxUserPerSlot
-		percentage := (float64(avaSlot.CurrentUsers) / float64(avaSlot.MaxUserPerSlot)) * 100
-		startTime := strconv.Itoa(time.Unix(avaSlot.SlotStartTime/1000, 0).Hour()) + ":" + strconv.Itoa(time.Unix(avaSlot.SlotStartTime/1000, 0).Minute())
-		output = append(output, "SlotStartTime="+startTime+", CurrentUsers="+strconv.FormatInt(avaSlot.CurrentUsers, 10)+" ,MaxUsers="+strconv.FormatInt(avaSlot.MaxUserPerSlot, 10)+" ,SlotsPercentage="+strconv.Itoa(int(percentage))+"%")
-		//fmt.Println("SlotStartTime="+startTime+" ,CurrentUsers="+strconv.FormatInt(avaSlot.CurrentUsers, 10),",MaxUsers="+strconv.FormatInt(avaSlot.MaxUserPerSlot, 10),",SlotsPercentage=",strconv.Itoa(int(percentage))+"%")
+	header["Authorization"] = "Bearer bb4a20783d034ce684b7f564bb13f2b15a9c80313d914b60b68f42f0fb75746c"
+	response := client.HitRequest("http://devicefarm.hikeapp.com/api/v1/devices", "GET", header, "")
+	errUnmarshal := json.Unmarshal(response, &responseV)
+	if errUnmarshal != nil {
+		fmt.Println(errUnmarshal)
 	}
-	ttlPercentage := (float64(currentUsers) / float64(totalUsers)) * 100
-	output = append(output, "Total:="+strconv.Itoa(int(currentUsers))+" / TotalPercentage:="+strconv.Itoa(int(ttlPercentage))+"%")
 
-	//fmt.Println("Total:=="+strconv.Itoa(int(currentUsers)),"TotalPercentage="+strconv.Itoa(int(ttlPercentage))+"%")
-	//fmt.Println(output)
+	for _, value := range responseV.Devices {
+		//Available
+		if value.Owner.Email == "" && value.Present == true {
+			//available = available + "{ \"title\": \"Model, OS\", \"value\": \"" + value.Model + "," + value.Version + "\", \"short\": true },"
+			available = available + strconv.Itoa(indexA) + ".) " + value.Model + ",\t" + value.Version + ",\t" + value.Serial + "\n"
+			indexA++
+			continue
+		}
 
+		//Busy
+		if value.Owner.Email != "" && value.Present == true {
+			//busy = busy + "{ \"title\": \"Model, OS, User\", \"value\": \"" + value.Model + "," + value.Version + "," + value.Owner.Email + "\", \"short\": true },"
+			busy = busy + strconv.Itoa(indexB) + ".) " + value.Model + ",\t" + value.Version + ",\t" + value.Serial + ",\t" + value.Owner.Email + "\n"
+			indexB++
+			continue
+		}
+
+		//disconnect
+		if value.Present == false {
+			//disconnected = disconnected + "{ \"title\": \"Model\", \"value\": \"" + value.Model + "\", \"short\": true },"
+			disconnected = disconnected + strconv.Itoa(indexD) + ".) " + value.Model + ",\t" + value.Serial + "\n"
+			indexD++
+			continue
+		}
+	}
+	output := appendToSlice(available, busy, disconnected)
 	reader := SubstParams(output, getPayload("slackpayload"))
-	//log.Println(reader)
-
+	//fmt.Println(reader)
 	client.HitRequest(slackUrl, "POST", header, reader)
-
-	//api := slack.New("xoxp-2151807574-3267458998-3324373337-2b7a5a")
-	//err := api.ChatPostMessage("hrd_admission_summary", "```" + strings.Join(output, "\n") + "```", nil)
-	//if err != nil {
-	//}
-	ctx.Response.SetBodyString("Ok")
+	//ctx.Response.SetBodyString("Ok")
 }
 
-func prepareSlackPayload() {
+func appendToSlice(available, busy, disconnected string) []string {
+	output := make([]string, 0)
+	if len(available) == 0 {
+		output = append(output, "NA")
+	} else {
+		output = append(output, available[:len(available)-1])
+	}
 
+	if len(busy) == 0 {
+		output = append(output, "NA")
+	} else {
+		output = append(output, busy[:len(busy)-1])
+	}
+
+	if len(disconnected) == 0 {
+		output = append(output, "NA")
+	} else {
+		output = append(output, disconnected[:len(disconnected)-1])
+	}
+	return output
 }
