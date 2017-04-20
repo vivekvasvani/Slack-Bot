@@ -67,8 +67,8 @@ func getSTGStatus(ctx *fasthttp.RequestCtx) {
 }
 
 func sendOptions(ctx *fasthttp.RequestCtx) {
-	requestBody := ctx.Request.ResetBody()
-	fmt.Println("request Body", requestBody)
+
+	fmt.Println("request Body", ctx.Request.ResetBody())
 }
 
 func appendToSlice(available, busy, disconnected string) []string {
