@@ -66,6 +66,11 @@ func getSTGStatus(ctx *fasthttp.RequestCtx) {
 	//ctx.Response.SetBodyString("Ok")
 }
 
+func sendOptions(ctx *fasthttp.RequestCtx) {
+	requestBody := ctx.Request.ResetBody()
+	fmt.Println("request Body", requestBody)
+}
+
 func appendToSlice(available, busy, disconnected string) []string {
 	output := make([]string, 0)
 	if len(available) == 0 {
