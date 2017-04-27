@@ -1,0 +1,30 @@
+{
+  "parameter": [
+    {
+      "name": "origin",
+      "value": "${0}"
+    },
+    {
+      "name": "Branch",
+      "value": "${1}"
+    },
+    {
+      "name": "Build_Flavour",
+      "value": [
+        "${2}"
+      ]
+    },
+    {
+      "name": "Theme",
+      "value": "${3}"
+    },
+    {
+      "name": "Slack_Notification",
+      "value": "${4}"
+    },
+    {
+      "name": "Email",
+      "value": ""
+    }
+  ]
+}

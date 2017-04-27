@@ -6,6 +6,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"github.com/vivekvasvani/Slack-Bot/client"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -13,7 +14,14 @@ const (
 	slackUrl         = "https://hooks.slack.com/services/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"
 )
 
-var header = make(map[string]string)
+var (
+	header     = make(map[string]string)
+	output     = make([]string, 0)
+	release    = make([]string, 0)
+	userId     string
+	wait       string
+	jenkinsUrl = "https://jenkins.im.hike.in:8443/view/Release%20(Integration)/job/android_on_demand_build/buildWithParameters?token=AaBbCcDd12345&origin=${0}&Branch=${1}&Build_Flavour=${2}&Theme=${3}&Slack_Notification=${4}"
+)
 
 func getSTGStatus(ctx *fasthttp.RequestCtx) {
 	var (
@@ -60,15 +68,83 @@ func getSTGStatus(ctx *fasthttp.RequestCtx) {
 		}
 	}
 	output := appendToSlice(available, busy, disconnected)
-	reader := SubstParams(output, getPayload("slackpayload"))
+	reader := SubstParams(output, GetPayload("slackpayload"))
 	//fmt.Println(reader)
 	client.HitRequest(slackUrl, "POST", header, reader)
 	//ctx.Response.SetBodyString("Ok")
 }
 
 func sendOptions(ctx *fasthttp.RequestCtx) {
+	var (
+		responseURL string
+	)
+	header["Content-Type"] = application_json
+	header["Accept"] = application_json
+	responseURL = string(ctx.PostArgs().Peek("response_url"))
+	text := string(ctx.PostArgs().Peek("text"))
+	if len(strings.Split(text, " ")) != 2 {
+		client.HitRequest(responseURL, "POST", header, " { \"text\" : \" Command line params are missing Expected /androidbuild [origin] [branchname]\" } ")
+	}
+	output = append(output, strings.Split(text, " ")[0])
+	output = append(output, strings.Split(text, " ")[1])
+	client.HitRequest(responseURL, "POST", header, SubstParams([]string{"\n" + strings.Join(release[:], ",")}, GetPayload("sendOptions.json")))
+}
 
-	fmt.Println("request Body", ctx.Request.ResetBody())
+func sendMoreOptions(ctx *fasthttp.RequestCtx) {
+	var (
+		requestPayloadButton Button
+		requestPayloadSelect Select
+	)
+
+	header["Content-Type"] = application_json
+	header["Accept"] = application_json
+	header["Authorization"] = "Basic dml2ZWt2QGhpa2UuaW46ZjE5NjFlMDVhM2QzMTczNGZhNGQwMmI3ZmNlMTQ2ZGQ="
+
+	error := json.Unmarshal(ctx.Request.PostArgs().Peek("payload"), &requestPayloadButton)
+	if error != nil {
+		fmt.Println(error)
+	}
+
+	//To send interactive elements
+	if requestPayloadButton.Actions[0].Type == "button" {
+		switch {
+		case requestPayloadButton.Actions[0].Type == "button" && requestPayloadButton.Actions[0].Value == "yes":
+			client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, SubstParams([]string{"\n Already Selected :" + strings.Join(release[:], ",")}, GetPayload("sendOptions.json")))
+
+		case requestPayloadButton.Actions[0].Type == "button" && requestPayloadButton.Actions[0].Value == "theme":
+			client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, SubstParams([]string{strings.Join(release[:], ",\n")}, GetPayload("selectTheme.json")))
+
+		case requestPayloadButton.Actions[0].Type == "button" && requestPayloadButton.Actions[0].Value == "done":
+			client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, SubstParams(output, GetPayload("finalResponseAfterSubmit.json")))
+			output = append(output, "@"+requestPayloadButton.User.Name)
+			payload := SubstParams(output, GetPayload("jenkins.json"))
+			jenkinsUrl = SubstParams(output, jenkinsUrl)
+			client.HitRequest(jenkinsUrl, "POST", header, payload)
+			output = make([]string, 0)
+			release = make([]string, 0)
+		}
+	}
+
+	//To unmarshell payload
+	if requestPayloadButton.Actions[0].Type == "select" {
+		error := json.Unmarshal(ctx.Request.PostArgs().Peek("payload"), &requestPayloadSelect)
+		if error != nil {
+			fmt.Println(error)
+		}
+
+		if requestPayloadSelect.CallbackID == "release" {
+			release = append(release, requestPayloadSelect.Actions[0].SelectedOptions[0].Value)
+		}
+
+	}
+
+	//To add values on final array, after getting done
+	if requestPayloadButton.Actions[0].Type == "select" && requestPayloadSelect.CallbackID == "theme_selection" {
+		output = append(output, strings.Join(release[:], ","))
+		output = append(output, requestPayloadSelect.Actions[0].SelectedOptions[0].Value)
+
+		client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, SubstParams(output, GetPayload("response.json")))
+	}
 }
 
 func appendToSlice(available, busy, disconnected string) []string {

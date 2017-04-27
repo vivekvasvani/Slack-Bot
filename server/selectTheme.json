@@ -1,0 +1,80 @@
+{
+    "channel" : "#testslack",
+    "text": "",
+    "response_type": "in_channel",
+    "replace_original": true,
+    "attachments": [
+        {
+            "text": " Selected Build Types :\n ${0}",
+            "fallback": "",
+            "color": "#3AA3E3",
+            "attachment_type": "default",
+            "callback_id": "theme_selection",
+            "actions": [
+                {
+                    "name": "build_type",
+                    "text": "Pick one Theme..",
+                    "type": "select",
+                    "options": [
+                        {
+                            "text": "Analytics and Personalization",
+                            "value": "Analytics and Personalization"
+                        },
+                        {
+                            "text": "App Ui and Themes",
+                            "value": "App Ui and Themes"
+                        },
+                        {
+                            "text": "Camera",
+                            "value": "Camera"
+                        },
+                        {
+                            "text": "Core Chat Experience",
+                            "value": "Core Chat Experience"
+                        },
+                        {
+                            "text": "DevEx",
+                            "value": "DevEx"
+                        },
+                        {
+                            "text": "Gaming",
+                            "value": "Gaming"
+                        },
+                        {
+                            "text": "Home Screen",
+                            "value": "Home Screen"
+                        },
+                        {
+                            "text": "Kairos",
+                            "value": "Kairos"
+                        },
+                        {
+                            "text": "Labs",
+                            "value": "Labs"
+                        },
+                        {
+                            "text": "MsgStack",
+                            "value": "MsgStack"
+                        },
+                        {
+                            "text": "Onboarding",
+                            "value": "Onboarding"
+                        },
+                        {
+                            "text": "Payments",
+                            "value": "Payments"
+                        },
+                        {
+                            "text": "Stickers",
+                            "value": "Stickers"
+                        },
+                        {
+                            "text": "Stories",
+                            "value": "Stories"
+                        }
+                    ]
+                }                
+            ]
+        }
+    ]
+}

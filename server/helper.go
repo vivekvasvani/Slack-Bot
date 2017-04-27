@@ -94,7 +94,111 @@ type STFResponse struct {
 	} `json:"devices"`
 }
 
-func getPayload(payloadPath string) string {
+type Select struct {
+	Actions []struct {
+		Name            string `json:"name"`
+		Type            string `json:"type"`
+		SelectedOptions []struct {
+			Value string `json:"value"`
+		} `json:"selected_options"`
+	} `json:"actions"`
+	CallbackID string `json:"callback_id"`
+	Team       struct {
+		ID     string `json:"id"`
+		Domain string `json:"domain"`
+	} `json:"team"`
+	Channel struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"channel"`
+	User struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"user"`
+	ActionTs        string `json:"action_ts"`
+	MessageTs       string `json:"message_ts"`
+	AttachmentID    string `json:"attachment_id"`
+	Token           string `json:"token"`
+	IsAppUnfurl     bool   `json:"is_app_unfurl"`
+	OriginalMessage struct {
+		Text        string `json:"text"`
+		BotID       string `json:"bot_id"`
+		Attachments []struct {
+			CallbackID string `json:"callback_id"`
+			Text       string `json:"text"`
+			ID         int    `json:"id"`
+			Color      string `json:"color"`
+			Actions    []struct {
+				ID         string `json:"id"`
+				Name       string `json:"name"`
+				Text       string `json:"text"`
+				Type       string `json:"type"`
+				DataSource string `json:"data_source"`
+				Options    []struct {
+					Text  string `json:"text"`
+					Value string `json:"value"`
+				} `json:"options"`
+			} `json:"actions"`
+		} `json:"attachments"`
+		Type    string `json:"type"`
+		Subtype string `json:"subtype"`
+		Ts      string `json:"ts"`
+	} `json:"original_message"`
+	ResponseURL string `json:"response_url"`
+}
+
+type Button struct {
+	Actions []struct {
+		Name  string `json:"name"`
+		Type  string `json:"type"`
+		Value string `json:"value"`
+	} `json:"actions"`
+	CallbackID string `json:"callback_id"`
+	Team       struct {
+		ID     string `json:"id"`
+		Domain string `json:"domain"`
+	} `json:"team"`
+	Channel struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"channel"`
+	User struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"user"`
+	ActionTs        string `json:"action_ts"`
+	MessageTs       string `json:"message_ts"`
+	AttachmentID    string `json:"attachment_id"`
+	Token           string `json:"token"`
+	IsAppUnfurl     bool   `json:"is_app_unfurl"`
+	OriginalMessage struct {
+		Text        string `json:"text"`
+		BotID       string `json:"bot_id"`
+		Attachments []struct {
+			CallbackID string `json:"callback_id"`
+			Text       string `json:"text"`
+			ID         int    `json:"id"`
+			Color      string `json:"color"`
+			Actions    []struct {
+				ID         string `json:"id"`
+				Name       string `json:"name"`
+				Text       string `json:"text"`
+				Type       string `json:"type"`
+				DataSource string `json:"data_source"`
+				Options    []struct {
+					Text  string `json:"text"`
+					Value string `json:"value"`
+				} `json:"options"`
+			} `json:"actions"`
+		} `json:"attachments"`
+		Type    string `json:"type"`
+		Subtype string `json:"subtype"`
+		Ts      string `json:"ts"`
+	} `json:"original_message"`
+	ResponseURL string `json:"response_url"`
+}
+
+func GetPayload(payloadPath string) string {
 	if payloadPath != "" {
 		dir, _ := os.Getwd()
 		templateData, _ := ioutil.ReadFile(dir + "/server/" + payloadPath)
