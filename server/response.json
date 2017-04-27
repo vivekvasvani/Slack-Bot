@@ -36,12 +36,14 @@
                     "name": "submit",
                     "text": "Submit",
                     "type": "button",
+                    "style": "primary",
                     "value": "done"
                 },                
                 {
                     "name": "Cancel",
                     "text": "Cancel",
                     "type": "button",
+                    "style": "danger",
                     "value": "cancel"
                 }  
                 

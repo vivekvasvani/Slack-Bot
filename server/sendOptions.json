@@ -52,18 +52,21 @@
                     "name": "wanttoselectmore",
                     "text": "More builds??",
                     "type": "button",
+                    "style": "primary",
                     "value": "yes"
                 },
                 {
                     "name": "No",
                     "text": "No, That's it!!!",
                     "type": "button",
+                    "style": "primary",
                     "value": "theme"
                 },
                 {
                     "name": "Cancel",
                     "text": "Cancel",
                     "type": "button",
+                    "style": "danger",
                     "value": "cancel"
                 }
             ]
