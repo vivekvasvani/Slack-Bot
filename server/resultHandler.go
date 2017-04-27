@@ -145,7 +145,10 @@ func sendMoreOptions(ctx *fasthttp.RequestCtx) {
 		}
 
 		if requestPayloadSelect.CallbackID == "release" {
-			release = append(release, requestPayloadSelect.Actions[0].SelectedOptions[0].Value)
+			valueReleaseType := requestPayloadSelect.Actions[0].SelectedOptions[0].Value
+			if !contains(release, valueReleaseType) {
+				release = append(release, valueReleaseType)
+			}
 		}
 
 	}
@@ -179,4 +182,13 @@ func appendToSlice(available, busy, disconnected string) []string {
 		output = append(output, disconnected[:len(disconnected)-1])
 	}
 	return output
+}
+
+func contains(s []int, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
