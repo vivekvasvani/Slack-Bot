@@ -81,6 +81,7 @@ func sendOptions(ctx *fasthttp.RequestCtx) {
 	header["Content-Type"] = application_json
 	header["Accept"] = application_json
 	responseURL = string(ctx.PostArgs().Peek("response_url"))
+	channelId = string(ctx.PostArgs().Peek("channel_id"))
 	text := string(ctx.PostArgs().Peek("text"))
 	if len(strings.Split(text, " ")) != 2 {
 		client.HitRequest(responseURL, "POST", header, " { \"text\" : \" Command line params are missing Expected /androidbuild [origin] [branchname]\" } ")

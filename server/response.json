@@ -1,5 +1,4 @@
-{
-    "channel" : "#testslack",
+{    
     "text": "",
     "response_type": "in_channel",
     "replace_original": true,
