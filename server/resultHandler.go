@@ -119,13 +119,13 @@ func sendMoreOptions(ctx *fasthttp.RequestCtx) {
 	//To send interactive elements
 	if requestPayloadButton.Actions[0].Type == "button" {
 		switch {
-		case requestPayloadButton.Actions[0].Type == "button" && requestPayloadButton.Actions[0].Value == "yes":
+		case requestPayloadButton.Actions[0].Value == "yes":
 			client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, SubstParams([]string{"\n Already Selected :" + strings.Join(release[:], ",")}, GetPayload("sendOptions.json")))
 
-		case requestPayloadButton.Actions[0].Type == "button" && requestPayloadButton.Actions[0].Value == "theme":
+		case requestPayloadButton.Actions[0].Value == "theme":
 			client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, SubstParams([]string{strings.Join(release[:], ",\n")}, GetPayload("selectTheme.json")))
 
-		case requestPayloadButton.Actions[0].Type == "button" && requestPayloadButton.Actions[0].Value == "done":
+		case requestPayloadButton.Actions[0].Value == "done":
 			client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, SubstParams(output, GetPayload("finalResponseAfterSubmit.json")))
 			jenkinsUrl := "https://jenkins.im.hike.in:8443/view/Release%20(Integration)/job/android_on_demand_build/buildWithParameters?token=AaBbCcDd12345&origin=${0}&Branch=${1}&Build_Flavour=${2}&Theme=${3}&Slack_Notification=${4}"
 			output = append(output, "@"+requestPayloadButton.User.Name)
@@ -134,6 +134,9 @@ func sendMoreOptions(ctx *fasthttp.RequestCtx) {
 			client.HitRequest(jenkinsUrl, "POST", header, payload)
 			output = make([]string, 0)
 			release = make([]string, 0)
+
+		case requestPayloadButton.Actions[0].Value == "cancel":
+			client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, "{ \"text\": \"Done\", \"response_type\": \"in_channel\", \"replace_original\": true }")
 		}
 	}
 
@@ -184,7 +187,7 @@ func appendToSlice(available, busy, disconnected string) []string {
 	return output
 }
 
-func contains(s []int, e string) bool {
+func contains(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
 			return true

@@ -37,6 +37,12 @@
                     "text": "Submit",
                     "type": "button",
                     "value": "done"
+                },                
+                {
+                    "name": "Cancel",
+                    "text": "Cancel",
+                    "type": "button",
+                    "value": "cancel"
                 }  
                 
             ]            

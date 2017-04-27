@@ -59,6 +59,12 @@
                     "text": "No, That's it!!!",
                     "type": "button",
                     "value": "theme"
+                },
+                {
+                    "name": "Cancel",
+                    "text": "Cancel",
+                    "type": "button",
+                    "value": "cancel"
                 }
             ]
         }

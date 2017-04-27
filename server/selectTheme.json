@@ -72,6 +72,12 @@
                             "value": "Stories"
                         }
                     ]
+                },
+                {
+                    "name": "Cancel",
+                    "text": "Cancel",
+                    "type": "button",
+                    "value": "cancel"
                 }                
             ]
         }
