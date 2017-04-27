@@ -136,7 +136,7 @@ func sendMoreOptions(ctx *fasthttp.RequestCtx) {
 			release = make([]string, 0)
 
 		case requestPayloadButton.Actions[0].Value == "cancel":
-			client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, "{ \"text\": \"Done\", \"response_type\": \"in_channel\", \"replace_original\": true }")
+			client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, "{ \"response_type\": \"in_channel\", \"delete_original\": true }") //"{ \"text\": \"Done\", \"response_type\": \"in_channel\", \"delete_original\": true }"
 		}
 	}
 
