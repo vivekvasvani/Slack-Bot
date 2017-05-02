@@ -159,7 +159,10 @@ func sendMoreOptions(ctx *fasthttp.RequestCtx) {
 	//To add values on final array, after getting done
 	if requestPayloadButton.Actions[0].Type == "select" && requestPayloadSelect.CallbackID == "theme_selection" {
 		output = append(output, strings.Join(release[:], ","))
-		output = append(output, requestPayloadSelect.Actions[0].SelectedOptions[0].Value)
+		themeWithoutEncoded := requestPayloadSelect.Actions[0].SelectedOptions[0].Value
+		themeWithoutEncoded = strings.Replace(themeWithoutEncoded, " ", "%20", -1)
+		output = append(output, themeWithoutEncoded)
+		//output = append(output, requestPayloadSelect.Actions[0].SelectedOptions[0].Value)
 
 		client.HitRequest(requestPayloadButton.ResponseURL, "POST", header, SubstParams(output, GetPayload("response.json")))
 	}
